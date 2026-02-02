@@ -1,6 +1,3 @@
-
-
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,7 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// Enums
+// --- Enums ---
 enum Role {
   STUDENT
   TUTOR
@@ -27,40 +24,49 @@ enum BookingStatus {
   CANCELLED
 }
 
-// Users Table
+// --- Models ---
+
 model User {
-  id          String       @id @default(uuid())
-  name        String
-  email       String       @unique
-  password    String
-  role        Role
-  status      UserStatus   @default(ACTIVE)
-  createdAt   DateTime     @default(now())
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      Role
+  status    UserStatus @default(ACTIVE)
+  createdAt DateTime   @default(now())
 
   // Relations
-  tutorProfile TutorProfile?
-  bookingsAsStudent Booking[] @relation("StudentBookings")
-  reviewsWritten Review[]
+  tutorProfile      TutorProfile?
+  bookingsAsStudent Booking[]      @relation("StudentBookings")
+  reviewsWritten    Review[]
 }
 
-// Tutor Profile Table
 model TutorProfile {
-  id       String  @id @default(uuid())
-  userId   String  @unique
-  bio      String
-  price    Int
-  rating   Float   @default(0)
+  id      String @id @default(uuid())
+  userId  String @unique
+  bio     String
+  price   Int
+  rating  Float  @default(0)
 
   // Relations
-  user        User      @relation(fields: [userId], references: [id])
-  bookings    Booking[] @relation("TutorBookings")
-  reviews     Review[]
+  user         User           @relation(fields: [userId], references: [id])
+  bookings     Booking[]      @relation("TutorBookings")
+  reviews      Review[]
   availability Availability[]
+
+  // Category Relation (Corrected)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
 }
 
-// Availability slots
+model Category {
+  id     String         @id @default(uuid())
+  name   String         @unique
+  tutors TutorProfile[] // Eita thaka must
+}
+
 model Availability {
-  id       String  @id @default(uuid())
+  id       String @id @default(uuid())
   tutorId  String
   date     String
   timeSlot String
@@ -68,13 +74,6 @@ model Availability {
   tutor TutorProfile @relation(fields: [tutorId], references: [userId])
 }
 
-// Categories Table
-model Category {
-  id   String @id @default(uuid())
-  name String @unique
-}
-
-// Bookings Table
 model Booking {
   id        String        @id @default(uuid())
   studentId String
@@ -88,9 +87,8 @@ model Booking {
   tutor   TutorProfile @relation("TutorBookings", fields: [tutorId], references: [userId])
 }
 
-// Review Table
 model Review {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   studentId String
   tutorId   String
   rating    Int

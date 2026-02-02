@@ -13,9 +13,9 @@ export const TutorController = {
     try{
 
       const tutors = await prisma.tutorProfile.findMany({
-        include: {
-          user: { select: { name: true, email: true } }
-        }
+       include: {
+    user: { select: { id: true, name: true, email: true, role: true } }
+ }
       });
       res.status(200).json({ success: true, data: tutors });
 

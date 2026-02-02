@@ -17,7 +17,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     return res.status(401).json({ success: false, message: "No token provided" });
   }
 
-  const JWT_SECRET = process.env.JWT_SECRET;
+  const JWT_SECRET = process.env.JWT_SECRET_KEY;
   if (!JWT_SECRET) {
     console.error("JWT_SECRET is not defined in environment variables!");
     return res.status(500).json({ success: false, message: "Server configuration error" });

@@ -1,8 +1,10 @@
 import { prisma } from "../../config/prisma";
 
+// Payload-e categoryId add kora hoyeche
 interface TutorProfilePayload {
   bio: string;
   price: number;
+  categoryId?: string; // Optional field
 }
 
 interface AvailabilitySlot {
@@ -13,29 +15,33 @@ interface AvailabilitySlot {
 export const TutorService = {
   // Create or update tutor profile
   upsertProfile: async (userId: string, data: TutorProfilePayload) => {
-    const { bio, price } = data;
+    const { bio, price, categoryId } = data;
 
-    const existingProfile = await prisma.tutorProfile.findUnique({
+    // Prisma-r built-in upsert method use kora holo (agee check korar dorkar nei)
+    return prisma.tutorProfile.upsert({
       where: { userId },
+      update: { 
+        bio, 
+        price, 
+        categoryId // Update korar somoy categoryId save hobe
+      },
+      create: { 
+        userId, 
+        bio, 
+        price, 
+        categoryId // Create korar somoy categoryId save hobe
+      },
     });
-
-    if (existingProfile) {
-      return prisma.tutorProfile.update({
-        where: { userId },
-        data: { bio, price },
-      });
-    } else {
-      return prisma.tutorProfile.create({
-        data: { userId, bio, price },
-      });
-    }
   },
 
-  // Get tutor profile with user info
+  // Get tutor profile with user info and category
   getProfile: async (userId: string) => {
     return prisma.tutorProfile.findUnique({
       where: { userId },
-      include: { user: { select: { name: true, email: true } } },
+      include: { 
+        user: { select: { name: true, email: true } },
+        category: true // Category details response-e ashar jonno
+      },
     });
   },
 
