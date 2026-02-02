@@ -8,24 +8,19 @@ interface AuthRequest extends Request {
 
 export const TutorController = {
 
-   getAllTutors: async(req: Request, res: Response) => {
-
-    try{
-
-      const tutors = await prisma.tutorProfile.findMany({
-       include: {
-    user: { select: { id: true, name: true, email: true, role: true } }
- }
-      });
-      res.status(200).json({ success: true, data: tutors });
-
-
-
-    }catch(err:any){
-      res.status(400).json({ success: false, message: err.message });
-    }
-
-  },
+ getAllTutors: async (req: Request, res: Response) => {
+  try {
+    const tutors = await prisma.tutorProfile.findMany({
+      include: {
+        category: true, // category name dekhabe
+        user: { select: { name: true, email: true } }
+      }
+    });
+    res.status(200).json({ success: true, data: tutors });
+  } catch (err: any) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+},
 
     
   // Create/update profile

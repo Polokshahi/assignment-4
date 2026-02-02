@@ -1,14 +1,24 @@
+
+
 import { Router } from "express";
-import { AdminController } from "./admin.controller";
 import { authMiddleware } from "../middlewares/auth";
-import { adminMiddleware } from "../middlewares/admin";
+import { AdminController } from "./admin.controller";
+
+
+
 
 const router = Router();
 
-// All routes require auth + admin check
-router.use(authMiddleware, adminMiddleware);
+router.use(authMiddleware, (req: any, res, next)=>{
+    if(req.user.role !== "ADMIN"){
+        return res.status(403).json({ success: false, message: "Forbidden: Admin access only" });
+    }
+
+    next();
+} );
 
 router.get("/users", AdminController.getUsers);
+router.patch("/users/:id/status", AdminController.updateUserStatus);
 router.delete("/users/:id", AdminController.deleteUser);
 
 export const AdminRoutes = router;

@@ -42,12 +42,14 @@ export const AuthService = {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) throw new Error("Invalid credentials");
-    if (user.status === "BANNED") throw new Error("User is banned");
+    if (user.status === "BANNED") {
+      throw new Error("Your account has been banned. Please contact admin.");
+    }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) throw new Error("Invalid credentials");
 
-    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "7d" });
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: "10d" });
 
     return {
       token,
@@ -56,6 +58,7 @@ export const AuthService = {
         name: user.name,
         email: user.email,
         role: user.role,
+        status: user.status,
       },
     };
   },

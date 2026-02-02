@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { prisma } from "../config/prisma"; // Prisma instance import koro
 
 interface AuthRequest extends Request {
   user?: { userId: string; role: string };
 }
 
-export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
+  // 1. Authorization header ache kina check
   if (!authHeader) {
     return res.status(401).json({ success: false, message: "No token provided" });
   }
@@ -24,6 +26,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   }
 
   try {
+    // 2. Token verify kora
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     // Type guard: ensure decoded has userId and role
@@ -31,6 +34,21 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
 
+    // 3. Database theke User status check kora (Security Boost)
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId as string },
+      select: { status: true }
+    });
+
+    // Jodi user na thake ba user BANNED thake
+    if (!user || user.status === "BANNED") {
+      return res.status(403).json({ 
+        success: false, 
+        message: "Access denied. Your account is banned or does not exist." 
+      });
+    }
+
+    // 4. Request object-e user data assign kora
     req.user = {
       userId: decoded.userId as string,
       role: decoded.role as string,
@@ -38,6 +56,6 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
 
     next();
   } catch (err) {
-    return res.status(401).json({ success: false, message: "Invalid token" });
+    return res.status(401).json({ success: false, message: "Invalid token or expired" });
   }
 };
