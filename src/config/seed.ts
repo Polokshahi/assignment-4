@@ -1,26 +1,36 @@
 import "dotenv/config";
 import bcrypt from "bcrypt";
-import { prisma } from "./prisma";
+// .ts extension ba puru path-ti kheyal koro
+import { prisma } from "../config/prisma"; 
 
 async function main() {
-  // 1️⃣ Admin user
-  const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD as string, 10);
+  const email = process.env.ADMIN_EMAIL; 
+ const plainPassword = process.env.ADMIN_PASSWORD;
+
+  if (!email || !plainPassword) {
+    throw new Error("ADMIN_EMAIL or ADMIN_PASSWORD missing in .env file");
+  }
+
+  // Admin password hashing
+  const adminPassword = await bcrypt.hash(plainPassword, 10);
+
   const admin = await prisma.user.upsert({
-    where: { email: process.env.ADMIN_EMAIL as string },
-    update: {},
+    where: { email: email },
+    update: {}, // Jodi thake tobe kichu korbe na
     create: {
       name: "Admin Shaheb",
-      email: process.env.ADMIN_EMAIL as string,
+      email: email,
       password: adminPassword,
-      role: "ADMIN",
+      role: "ADMIN", // Tomar enum onujayi uppercase
     },
   });
-  console.log("Admin created:", admin.email);
+
+  console.log("✅ Admin setup complete:", admin.email);
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed error:", e);
     process.exit(1);
   })
   .finally(async () => {

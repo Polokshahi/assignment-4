@@ -4,6 +4,8 @@ import { authMiddleware } from "../../middlewares/auth";
 
 const router = Router();
 
+router.get("/", TutorController.getAllTutors);
+
 // All routes require authentication and role = TUTOR
 router.use(authMiddleware, (req: any, res, next) => {
   if (req.user.role !== "TUTOR") {

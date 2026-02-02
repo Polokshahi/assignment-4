@@ -1,11 +1,33 @@
 import { Request, Response } from "express";
 import { TutorService } from "./tutor.service";
+import { prisma } from "../../config/prisma";
 
 interface AuthRequest extends Request {
   user?: { userId: string; role: string };
 }
 
 export const TutorController = {
+
+   getAllTutors: async(req: Request, res: Response) => {
+
+    try{
+
+      const tutors = await prisma.tutorProfile.findMany({
+        include: {
+          user: { select: { name: true, email: true } }
+        }
+      });
+      res.status(200).json({ success: true, data: tutors });
+
+
+
+    }catch(err:any){
+      res.status(400).json({ success: false, message: err.message });
+    }
+
+  },
+
+    
   // Create/update profile
   upsertProfile: async (req: AuthRequest, res: Response) => {
     try {
