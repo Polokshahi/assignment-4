@@ -1,0 +1,103 @@
+
+
+generator client {
+  provider = "prisma-client"
+  output   = "./src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// Enums
+enum Role {
+  STUDENT
+  TUTOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  BANNED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// Users Table
+model User {
+  id          String       @id @default(uuid())
+  name        String
+  email       String       @unique
+  password    String
+  role        Role
+  status      UserStatus   @default(ACTIVE)
+  createdAt   DateTime     @default(now())
+
+  // Relations
+  tutorProfile TutorProfile?
+  bookingsAsStudent Booking[] @relation("StudentBookings")
+  reviewsWritten Review[]
+}
+
+// Tutor Profile Table
+model TutorProfile {
+  id       String  @id @default(uuid())
+  userId   String  @unique
+  bio      String
+  price    Int
+  rating   Float   @default(0)
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id])
+  bookings    Booking[] @relation("TutorBookings")
+  reviews     Review[]
+  availability Availability[]
+}
+
+// Availability slots
+model Availability {
+  id       String  @id @default(uuid())
+  tutorId  String
+  date     String
+  timeSlot String
+
+  tutor TutorProfile @relation(fields: [tutorId], references: [userId])
+}
+
+// Categories Table
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+}
+
+// Bookings Table
+model Booking {
+  id        String        @id @default(uuid())
+  studentId String
+  tutorId   String
+  date      String
+  timeSlot  String
+  status    BookingStatus @default(CONFIRMED)
+
+  // Relations
+  student User         @relation("StudentBookings", fields: [studentId], references: [id])
+  tutor   TutorProfile @relation("TutorBookings", fields: [tutorId], references: [userId])
+}
+
+// Review Table
+model Review {
+  id        String  @id @default(uuid())
+  studentId String
+  tutorId   String
+  rating    Int
+  comment   String
+
+  // Relations
+  student User         @relation(fields: [studentId], references: [id])
+  tutor   TutorProfile @relation(fields: [tutorId], references: [userId])
+}
