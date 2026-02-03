@@ -7,23 +7,22 @@ interface AuthRequest extends Request {
 }
 
 export const TutorController = {
+  // ১. সকল টিউটর আনা
+  getAllTutors: async (req: Request, res: Response) => {
+    try {
+      const tutors = await prisma.tutorProfile.findMany({
+        include: {
+          user: { select: { name: true, email: true } },
+          category: true,
+        },
+      });
+      res.status(200).json({ success: true, data: tutors });
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Failed to load tutors" });
+    }
+  },
 
- getAllTutors: async (req: Request, res: Response) => {
-  try {
-    const tutors = await prisma.tutorProfile.findMany({
-      include: {
-        category: true, // category name dekhabe
-        user: { select: { name: true, email: true } }
-      }
-    });
-    res.status(200).json({ success: true, data: tutors });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
-  }
-},
-
-    
-  // Create/update profile
+  // ২. প্রোফাইল তৈরি বা আপডেট
   upsertProfile: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -34,7 +33,7 @@ export const TutorController = {
     }
   },
 
-  // Get profile
+  // ৩. প্রোফাইল দেখা
   getProfile: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -45,23 +44,50 @@ export const TutorController = {
     }
   },
 
-  // Set availability slots
-  setAvailability: async (req: AuthRequest, res: Response) => {
-    try {
-      if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
-      const slots = req.body.slots;
-      await TutorService.setAvailability(req.user.userId, slots);
-      res.status(200).json({ success: true, message: "Availability updated" });
-    } catch (err: any) {
-      res.status(400).json({ success: false, message: err.message });
-    }
-  },
+  // ৪. অ্যাভেইল্যাবিলিটি ফিক্স (Foreign Key Error সমাধান)
+ // tutor.controller.ts
+setAvailability: async (req: AuthRequest, res: Response) => {
+  try {
+    const uId = req.user?.userId;
+    if (!uId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-  // Get bookings for tutor
+    // ১. টোকেন থেকে পাওয়া userId দিয়ে TutorProfile অবজেক্টটি ডাটাবেস থেকে খুঁজে আনুন
+    const profile = await prisma.tutorProfile.findUnique({
+      where: { userId: uId }
+    });
+
+    // ২. প্রোফাইল না থাকলে স্লট সেভ করা সম্ভব না
+    if (!profile) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Tutor profile not found. Please save bio/price first." 
+      });
+    }
+
+    const { slots } = req.body;
+
+    // ৩. সার্ভিস কল করার সময় profile.id দিন (userId নয়)
+    await TutorService.setAvailability(profile.id, slots);
+    
+    res.status(200).json({ success: true, message: "Availability updated" });
+  } catch (err: any) {
+    console.error("Availability Error:", err.message);
+    res.status(400).json({ success: false, message: err.message });
+  }
+},
+
+  // ৫. বুকিং লিস্ট
   getBookings: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
-      const bookings = await TutorService.getBookings(req.user.userId);
+
+      const tutorProfile = await prisma.tutorProfile.findUnique({
+        where: { userId: req.user.userId }
+      });
+
+      if (!tutorProfile) return res.status(404).json({ success: false, message: "Profile not found" });
+
+      const bookings = await TutorService.getBookings(tutorProfile.id);
       res.status(200).json({ success: true, data: bookings });
     } catch (err: any) {
       res.status(400).json({ success: false, message: err.message });

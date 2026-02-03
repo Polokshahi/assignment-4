@@ -71,7 +71,8 @@ model Availability {
   date     String
   timeSlot String
 
-  tutor TutorProfile @relation(fields: [tutorId], references: [userId])
+  
+  tutor TutorProfile @relation(fields: [tutorId], references: [id]) 
 }
 
 model Booking {
@@ -82,9 +83,8 @@ model Booking {
   timeSlot  String
   status    BookingStatus @default(CONFIRMED)
 
-  // Relations
   student User         @relation("StudentBookings", fields: [studentId], references: [id])
-  tutor   TutorProfile @relation("TutorBookings", fields: [tutorId], references: [userId])
+  tutor   TutorProfile @relation("TutorBookings", fields: [tutorId], references: [id]) 
 }
 
 model Review {
@@ -96,5 +96,7 @@ model Review {
 
   // Relations
   student User         @relation(fields: [studentId], references: [id])
-  tutor   TutorProfile @relation(fields: [tutorId], references: [userId])
+  
+  // ফিক্স: এখানে references: [id] হতে হবে, [userId] নয়
+  tutor   TutorProfile @relation(fields: [tutorId], references: [id]) 
 }
