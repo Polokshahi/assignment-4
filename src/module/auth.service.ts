@@ -22,14 +22,14 @@ export const AuthService = {
   register: async (payload: RegisterPayload) => {
     const { name, email, password, role } = payload;
 
-    // Check existing user
+  
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) throw new Error("User already exists");
 
-    // Hash password
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+
     const user = await prisma.user.create({
       data: { name, email, password: hashedPassword, role },
     });

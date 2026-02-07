@@ -7,10 +7,10 @@ interface AuthRequest extends Request {
 }
 
 export const TutorController = {
-  // ১. সকল টিউটর আনা
+
   getAllTutors: async (req: Request, res: Response) => {
     try {
-      // req.query সরাসরি সার্ভিসে পাঠানো হচ্ছে
+  
       const tutors = await TutorService.getAllTutors(req.query);
 
       res.status(200).json({
@@ -27,7 +27,7 @@ export const TutorController = {
     }
   },
 
-  // ২. প্রোফাইল তৈরি বা আপডেট
+
   upsertProfile: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -38,7 +38,7 @@ export const TutorController = {
     }
   },
 
-  // ৩. প্রোফাইল দেখা
+
   getProfile: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -49,19 +49,18 @@ export const TutorController = {
     }
   },
 
-  // ৪. অ্যাভেইল্যাবিলিটি ফিক্স (Foreign Key Error সমাধান)
- // tutor.controller.ts
+
+
 setAvailability: async (req: AuthRequest, res: Response) => {
   try {
     const uId = req.user?.userId;
     if (!uId) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-    // ১. টোকেন থেকে পাওয়া userId দিয়ে TutorProfile অবজেক্টটি ডাটাবেস থেকে খুঁজে আনুন
+   
     const profile = await prisma.tutorProfile.findUnique({
       where: { userId: uId }
     });
 
-    // ২. প্রোফাইল না থাকলে স্লট সেভ করা সম্ভব না
     if (!profile) {
       return res.status(404).json({ 
         success: false, 
@@ -71,7 +70,6 @@ setAvailability: async (req: AuthRequest, res: Response) => {
 
     const { slots } = req.body;
 
-    // ৩. সার্ভিস কল করার সময় profile.id দিন (userId নয়)
     await TutorService.setAvailability(profile.id, slots);
     
     res.status(200).json({ success: true, message: "Availability updated" });
@@ -81,7 +79,6 @@ setAvailability: async (req: AuthRequest, res: Response) => {
   }
 },
 
-  // ৫. বুকিং লিস্ট
   getBookings: async (req: AuthRequest, res: Response) => {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });

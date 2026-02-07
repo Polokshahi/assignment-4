@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { UserService } from "./user.service";
 
-// Admin functions
+
 export const UserController = {
   getAllUsers: async (req: any, res: Response) => {
     try {
@@ -15,7 +15,7 @@ export const UserController = {
   updateUserStatus: async (req: any, res: Response) => {
     try {
       const { id } = req.params;
-      const { status } = req.body; // ACTIVE | BANNED
+      const { status } = req.body; 
       const updatedUser = await UserService.updateUserStatus(id, status);
       res.status(200).json({ success: true, data: updatedUser });
     } catch (error: any) {
@@ -23,7 +23,7 @@ export const UserController = {
     }
   },
 
-  // Student/Tutor: Update profile
+ 
   updateProfile: async (req: any, res: Response) => {
     try {
       const userId = req.user.userId;

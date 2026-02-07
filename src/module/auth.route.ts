@@ -7,7 +7,6 @@ import validateRequest from "../middlewares/validateRequest";
 
 const router = Router();
 
-// Public routes
 router.post(
   "/register", 
   validateRequest(AuthValidations.registrationSchema), 
@@ -20,7 +19,7 @@ router.post(
   AuthController.login
 );
 
-// Protected route
+
 router.get("/me", authMiddleware, AuthController.me);
 
 export const AuthRoutes = router;

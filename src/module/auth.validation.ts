@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
-// Registration Validation
-// Registration Validation
+
 const registrationSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Name is required'), 
@@ -11,7 +10,7 @@ const registrationSchema = z.object({
   }),
 });
 
-// Login Validation
+
 const loginSchema = z.object({
   body: z.object({
     email: z.string().email('Invalid email address'),
@@ -19,7 +18,7 @@ const loginSchema = z.object({
   }),
 });
 
-// Booking Validation
+
 const bookingSchema = z.object({
   body: z.object({
     tutorId: z.string().uuid('Invalid Tutor ID'),

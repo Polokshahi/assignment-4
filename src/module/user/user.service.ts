@@ -2,7 +2,6 @@ import { prisma } from "../../config/prisma";
 import bcrypt from "bcrypt";
 
 export const UserService = {
-  // Admin: Get all users
   getAllUsers: async () => {
     return prisma.user.findMany({
       select: {
@@ -16,7 +15,7 @@ export const UserService = {
     });
   },
 
-  // Admin: Ban or Unban user
+
   updateUserStatus: async (userId: string, status: "ACTIVE" | "BANNED") => {
     return prisma.user.update({
       where: { id: userId },
@@ -24,7 +23,7 @@ export const UserService = {
     });
   },
 
-  // Student/Tutor: Update own profile
+
   updateProfile: async (userId: string, data: any) => {
     const { name, password } = data;
     const updateData: any = { name };

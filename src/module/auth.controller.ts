@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
 
-// Extend Request type for authMiddleware
+
 interface AuthRequest extends Request {
   user?: { userId: string; role: string };
 }
