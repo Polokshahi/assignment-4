@@ -26,7 +26,7 @@ export const BookingController = {
     try {
       if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
 
-      // সার্ভিসে userId এবং role পাঠানো হচ্ছে
+  
       const bookings = await BookingService.getUserBookings(
         req.user.userId, 
         req.user.role as any

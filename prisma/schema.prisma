@@ -6,7 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
-// --- Enums ---
+
 enum Role {
   STUDENT
   TUTOR
@@ -24,7 +24,7 @@ enum BookingStatus {
   CANCELLED
 }
 
-// --- Models ---
+
 
 model User {
   id        String     @id @default(uuid())
@@ -35,7 +35,6 @@ model User {
   status    UserStatus @default(ACTIVE)
   createdAt DateTime   @default(now())
 
-  // Relations
   tutorProfile      TutorProfile?
   bookingsAsStudent Booking[]      @relation("StudentBookings")
   reviewsWritten    Review[]
@@ -48,13 +47,13 @@ model TutorProfile {
   price   Int
   rating  Float  @default(0)
 
-  // Relations
+
   user         User           @relation(fields: [userId], references: [id])
   bookings     Booking[]      @relation("TutorBookings")
   reviews      Review[]
   availability Availability[]
 
-  // Category Relation (Corrected)
+ 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
 }
@@ -62,7 +61,7 @@ model TutorProfile {
 model Category {
   id     String         @id @default(uuid())
   name   String         @unique
-  tutors TutorProfile[] // Eita thaka must
+  tutors TutorProfile[] 
 }
 
 model Availability {
@@ -94,9 +93,8 @@ model Review {
   rating    Int
   comment   String
 
-  // Relations
+
   student User         @relation(fields: [studentId], references: [id])
-  
-  // ফিক্স: এখানে references: [id] হতে হবে, [userId] নয়
+
   tutor   TutorProfile @relation(fields: [tutorId], references: [id]) 
 }

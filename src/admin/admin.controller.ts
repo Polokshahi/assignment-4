@@ -6,6 +6,7 @@ export const AdminController = {
   getUsers: async (req: Request, res: Response) => {
     try {
       const users = await AdminService.getUsers();
+
       res.json({ success: true, data: users });
     } catch (err: any) {
       res.status(400).json({ success: false, message: err.message });
@@ -15,10 +16,11 @@ export const AdminController = {
   updateUserStatus: async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
+
       const { status } = req.body; 
       const user = await AdminService.updateUserStatus(id as string, status);
       
-      res.json({ success: true, message: `User status updated to ${status}`, data: user });
+          res.json({ success: true, message: `User status updated to ${status}`, data: user });
     } catch (err: any) {
       res.status(400).json({ success: false, message: err.message });
     }

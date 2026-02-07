@@ -12,7 +12,7 @@ export const BookingService = {
   createBooking: async (studentId: string, data: BookingPayload) => {
     const { tutorId, date, timeSlot } = data;
 
-    // ১. চেক করা যে স্লটটি টিউটরের অ্যাভেইল্যাবিলিটি লিস্টে আছে কি না
+   
     const isAvailable = await prisma.availability.findFirst({
       where: { tutorId, date, timeSlot },
     });
@@ -21,13 +21,13 @@ export const BookingService = {
       throw new Error("This time slot is no longer available.");
     }
 
-    // ২. ট্রানজ্যাকশন ব্যবহার করে বুকিং করা এবং স্লট ডিলিট করা
+ 
     return await prisma.$transaction(async (tx) => {
       const booking = await tx.booking.create({
         data: { studentId, tutorId, date, timeSlot, status: "CONFIRMED" },
       });
 
-      // স্লটটি টিউটরের অ্যাভেইল্যাবিলিটি থেকে সরিয়ে ফেলা
+      
       await tx.availability.delete({
         where: { id: isAvailable.id },
       });
@@ -38,23 +38,23 @@ export const BookingService = {
 
   getUserBookings: async (userId: string, role: UserRole) => {
     if (role === "STUDENT") {
-      // স্টুডেন্টের জন্য বুকিং লিস্ট (টিউটর এবং তার ক্যাটাগরি সহ)
+      
       return prisma.booking.findMany({
         where: { studentId: userId },
         include: {
           tutor: {
             include: { 
               user: { select: { name: true, email: true } },
-              category: true // এটি মিসিং ছিল, যা ফ্রন্টএন্ডে এরর দিচ্ছিল
+              category: true 
             },
           },
         },
         orderBy: {
-          date: 'desc' // লেটেস্ট বুকিং আগে দেখাবে
+          date: 'desc' 
         }
       });
     } else if (role === "TUTOR") {
-      // টিউটরের ক্ষেত্রে userId থেকে আগে প্রোফাইল আইডি খুঁজে বের করা
+   
       const profile = await prisma.tutorProfile.findUnique({ where: { userId } });
       if (!profile) return [];
 
@@ -68,7 +68,7 @@ export const BookingService = {
         }
       });
     } else {
-      // এডমিনের জন্য সব বুকিং
+  
       return prisma.booking.findMany({
         include: {
           student: { select: { name: true, email: true } },

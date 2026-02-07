@@ -22,7 +22,6 @@ app.get('/', (req: Request, res: Response) => {
 
 
 app.use("/api/auth", AuthRoutes);
-
 app.use("/api/users", UserRoutes);
 
 app.use("/api/tutors", TutorRoutes);
@@ -37,10 +36,10 @@ app.use("/api/admin", AdminRoutes);
 
 
 
-// ৪MD - Not Found Route
+
 app.use(notFound);
 
-// Global Error Handler
+
 app.use(globalErrorHandler);
 
 

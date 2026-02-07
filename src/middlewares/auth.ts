@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { prisma } from "../config/prisma"; // Prisma instance import koro
+import { prisma } from "../config/prisma"; 
 
 interface AuthRequest extends Request {
   user?: { userId: string; role: string };
@@ -9,7 +9,7 @@ interface AuthRequest extends Request {
 export const authMiddleware = async (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
-  // 1. Authorization header ache kina check
+
   if (!authHeader) {
     return res.status(401).json({ success: false, message: "No token provided" });
   }
@@ -26,21 +26,20 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
   }
 
   try {
-    // 2. Token verify kora
+  
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    // Type guard: ensure decoded has userId and role
+
     if (!decoded || typeof decoded === "string" || !("userId" in decoded) || !("role" in decoded)) {
       return res.status(401).json({ success: false, message: "Invalid token" });
     }
 
-    // 3. Database theke User status check kora (Security Boost)
+ 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId as string },
       select: { status: true }
     });
 
-    // Jodi user na thake ba user BANNED thake
     if (!user || user.status === "BANNED") {
       return res.status(403).json({ 
         success: false, 
@@ -48,7 +47,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
       });
     }
 
-    // 4. Request object-e user data assign kora
+
     req.user = {
       userId: decoded.userId as string,
       role: decoded.role as string,

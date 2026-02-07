@@ -11,7 +11,7 @@ const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
     },
   ];
 
-  // Zod Error হ্যান্ডেল করা
+
   if (err instanceof ZodError) {
     statusCode = 400;
     message = 'Validation Error';
