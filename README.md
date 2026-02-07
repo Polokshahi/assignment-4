@@ -1,41 +1,39 @@
-SkillBridge is a simple and modern web app that helps students find and book sessions with expert tutors. This repository contains the frontend built with Next.js and TypeScript.
+SkillBridge – Backend API
+
+This is the backend for SkillBridge. It manages user login, roles, tutor data, and session bookings.
 
 Project Links
 
-Live Site: (Vercel link)
+API Live URL: [Backend Live Link]
 
-Backend Repo: (GitHub backend link)
+Frontend Repository: [Frontend GitHub Link]
 
-Demo Video: (5–10 min walkthrough)
-
-Admin Login
-
-Email: polokshahi3@gmail.com
-Password: polok2020
-
-Features
-
-Role-based access for Students, Tutors, and Admin
-Browse tutors by category, price, and rating
-Real-time booking based on tutor availability
-Fully responsive UI for mobile, tablet, and desktop
-
- Tech Stack
-
-Next.js (App Router)
+Tech Stack
+Node.js
+Express.js
 TypeScript
-Tailwind CSS & Shadcn UI
-Lucide Icons
-Sonner for notifications
+PostgreSQL
+Prisma ORM
 
-Getting Started
+What It Does
 
-Clone the repository
-git clone <repo-url>
-Install dependencies
-npm install
+Users & Roles: Student, Tutor, Admin
+Tutor Profiles: Bio, hourly rate, ratings
+Bookings: Uses Prisma transactions to prevent double booking by automatically locking time slots
 
-Add environment variables in .env.local
+Main API Endpoints
 
-Run the app
-npm run dev
+POST /api/auth/register – Create an account
+GET /api/tutors – View tutors with filters
+POST /api/bookings – Book a session
+GET /api/bookings/my-bookings – View your bookings
+
+How to Run Locally
+
+Clone the repo
+
+Install packages: npm install
+
+Set up .env with DATABASE_URL and JWT_SECRET
+
+Run Prisma: npx prisma generate && npx prisma db push
