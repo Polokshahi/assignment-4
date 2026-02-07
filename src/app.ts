@@ -6,6 +6,8 @@ import { TutorRoutes } from './module/tutor/tutor.route';
 import { BookingRoutes } from './module/booking/booking.route';
 import { ReviewRoutes } from './module/review/review.route';
 import { AdminRoutes } from './admin/admin.routes';
+import notFound from './middlewares/notFound';
+import globalErrorHandler from './middlewares/globalErrorHandler';
 
 const app = express();
 
@@ -35,7 +37,11 @@ app.use("/api/admin", AdminRoutes);
 
 
 
+// ৪MD - Not Found Route
+app.use(notFound);
 
+// Global Error Handler
+app.use(globalErrorHandler);
 
 
 

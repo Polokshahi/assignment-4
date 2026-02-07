@@ -10,15 +10,20 @@ export const TutorController = {
   // ১. সকল টিউটর আনা
   getAllTutors: async (req: Request, res: Response) => {
     try {
-      const tutors = await prisma.tutorProfile.findMany({
-        include: {
-          user: { select: { name: true, email: true } },
-          category: true,
-        },
+      // req.query সরাসরি সার্ভিসে পাঠানো হচ্ছে
+      const tutors = await TutorService.getAllTutors(req.query);
+
+      res.status(200).json({
+        success: true,
+        message: "Tutors retrieved successfully",
+        data: tutors,
       });
-      res.status(200).json({ success: true, data: tutors });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Failed to load tutors" });
+    } catch (error: any) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to load tutors",
+        error: error.message
+      });
     }
   },
 
