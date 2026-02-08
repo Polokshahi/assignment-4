@@ -13,7 +13,10 @@ const app = express();
 
 
 app.use(express.json());
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: [
+  'https://assignment-4-frontend-six.vercel.app',
+  'http://localhost:3000'
+], credentials: true }));
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!');
